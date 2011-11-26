@@ -6,7 +6,7 @@ data Person = Hans | Klaus | Erna | Elke
     deriving (Show, Eq)
 
 main = run
-    [ Hans  `Payed` 500 `for` [Klaus]
-    , Klaus `Payed` 510 `for` [Hans]
-    , Hans  `Payed` 10 `for` [Erna, Elke]
+    [ Hans  `payed` 500 `for` [Klaus]
+    , Klaus `payed` 510 `for` [Hans]
+    , Hans  `payed` 10  `for` [Erna, Elke]
     ]

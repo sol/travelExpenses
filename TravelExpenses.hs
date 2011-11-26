@@ -6,14 +6,17 @@ module TravelExpenses where
 
 import Text.Printf
 
--- configuration: edit here
+for :: Payed a -> [a] -> PayedFor a
+for = For
 
--- end of configuration: leave the rest as it is
-
-for = ($)
+payed :: a -> Rational -> Payed a
+payed = Payed
 
 -- Input: payer, amount, receivers
-data PayedFor a = Payed a Rational [a]
+data Payed a = a `Payed` Rational
+    deriving Show
+
+data PayedFor a = (Payed a) `For` [a]
     deriving Show
 
 -- Output: the first person owes an amount to the second person
@@ -28,7 +31,7 @@ instance Show a => Show (Owes a) where
 
 -- turns a payment into a list of debts
 pays2owes :: PayedFor a -> [Owes a]
-pays2owes (Payed payer amount receivers) =
+pays2owes (For (Payed payer amount) receivers) =
     [Owes receiver fraction payer | receiver <- receivers]
         where fraction = amount / (fromIntegral $ length receivers)
 

@@ -2,7 +2,7 @@ module Monadic (Expenses, run, run_, payed, for) where
 
 import           Control.Monad.Trans.Writer
 
-import           TravelExpenses hiding (run, run_)
+import           TravelExpenses hiding (run, run_, for)
 import qualified TravelExpenses
 
 newtype ExpensesM person a = ExpensesM { runExpensesM :: Writer [PayedFor person] a }
@@ -13,8 +13,8 @@ instance Monad (ExpensesM person) where
 
 type Expenses person = ExpensesM person ()
 
-payed :: person -> Rational -> [person] -> Expenses person
-payed p a = ExpensesM . tell . return . Payed p a
+for :: Payed person -> [person] -> Expenses person
+for x y = ExpensesM . tell . return $ x `TravelExpenses.for` y
 
 run :: (Show person, Eq person) => Expenses person -> IO ()
 run = TravelExpenses.run . snd . runWriter . runExpensesM
