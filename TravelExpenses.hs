@@ -55,5 +55,8 @@ flipDebt (Owes pA amount pB) =
         then (Owes pB (-amount) pA)
         else (Owes pA amount pB)
 
+run_ :: Eq a => [PayedFor a] -> [Owes a]
+run_ = map flipDebt . filter (\(Owes a _ b) -> a /= b) . processAll . allDebts
+
 run :: (Show a, Eq a) => [PayedFor a] -> IO ()
-run = mapM_ print . map flipDebt . filter (\(Owes a _ b) -> a /= b) . processAll . allDebts
+run = mapM_ print . run_
