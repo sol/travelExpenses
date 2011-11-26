@@ -1,7 +1,9 @@
+-- |
 -- * A group of people makes a trip.
+--
 -- * Repeatedly: someone pays a bill for a subset of the group.
+--
 -- * How much does anyone owe to anyone else?
-
 module TravelExpenses where
 
 import Text.Printf
