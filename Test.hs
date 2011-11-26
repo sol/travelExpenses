@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, FlexibleInstances #-}
 module Test where
 
 import Test.QuickCheck
@@ -10,7 +10,10 @@ import Test.Framework.Providers.QuickCheck2
 
 import qualified Data.List as List
 
-import Main hiding (main)
+import TravelExpenses
+
+data Person = Hans | Klaus | Erna | Elke
+    deriving (Show, Eq, Enum, Bounded)
 
 payedForAmount (Payed _ am _) = am
 
@@ -18,7 +21,7 @@ payedForAmount (Payed _ am _) = am
 instance Arbitrary Person where
     arbitrary = elements [minBound .. maxBound]
 
-instance Arbitrary PayedFor where
+instance Arbitrary (PayedFor Person) where
     arbitrary = do
         payer <- arbitrary
         amount <- arbitrary
@@ -28,8 +31,12 @@ instance Arbitrary PayedFor where
 sumDebts = sum . (map (\(Owes _ amount _) -> amount))
 sumExpenses = sum . (map (\(Payed _ amount _) -> amount))
 
+prop_sumOfOneExpense :: PayedFor Person -> Bool
 prop_sumOfOneExpense expense = (payedForAmount expense) == (sumDebts $ pays2owes expense)
+
+prop_sumOfLotsExpenses :: [PayedFor Person] -> Bool
 prop_sumOfLotsExpenses expenses = (sumExpenses expenses) == (sumDebts $ allDebts expenses)
+
 case_oneReceiver = ((Owes Klaus 200 Hans) `elem` (allDebts [(Payed Hans 200 [Klaus])])) @=? True
 case_twoReceivers = ((Owes Klaus 100 Hans) `elem` (allDebts [(Payed Hans 200 [Klaus, Hans])])) @=? True
 case_threeReceivers = ((Owes Klaus 100 Hans) `elem` (allDebts [(Payed Hans 300 [Klaus, Hans, Elke])])) @=? True
