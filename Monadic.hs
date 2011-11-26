@@ -1,9 +1,13 @@
-module Monadic (Expenses, run, run_, payed, for) where
+module Monadic (Expenses, run, run_, payed, for, and, All(..), but) where
+
+import Prelude hiding (and)
 
 import           Control.Monad.Trans.Writer
 
 import           TravelExpenses hiding (run, run_, for)
 import qualified TravelExpenses
+
+import           Party
 
 newtype ExpensesM person a = ExpensesM { runExpensesM :: Writer [PayedFor person] a }
 
@@ -13,8 +17,9 @@ instance Monad (ExpensesM person) where
 
 type Expenses person = ExpensesM person ()
 
-for :: Payed person -> [person] -> Expenses person
-for x y = ExpensesM . tell . return $ x `TravelExpenses.for` y
+infixl 7 `for`
+for :: (IsParty a person) => Payed person -> a -> Expenses person
+for p party = ExpensesM . tell . return $ p `TravelExpenses.for` toList party
 
 run :: (Show person, Eq person) => Expenses person -> IO ()
 run = TravelExpenses.run . snd . runWriter . runExpensesM
